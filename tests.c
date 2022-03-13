@@ -8,6 +8,9 @@ Tests!
 #include "montecarlo.h"
 #include "assert.h"
 
+int N = (int) 1E6;
+double PRECISION = 1E-2;  // 1 in 100
+
 void run_tests();
 
 int main(){
@@ -62,11 +65,21 @@ int cube_condition(point *apoint){
     }
 }
 
-
+int error_calculate(double predicted, double expected){
+    
+    // return 0 if difference between v and w is less than PRECISION
+    double dx;
+    dx = fabs(predicted - expected) / expected;
+    if (dx < PRECISION){
+        return 0;
+    } else {
+        printf("!!!!!!!!!!\nDeviation!\n%f | %f | %f\n!!!!!!!!!!", predicted, expected, dx);
+        return 1;  // error!
+    }
+}
 
 int test_line(){
     // unit line
-    int N = (int) 1E6;
     mc line;
     line.condition = line_condition;
     line.next_point = randomise_point;
@@ -78,17 +91,18 @@ int test_line(){
     line.limits.z.l = 0;
     line.limits.z.h = 0;
     
+    double expected;
+    expected = 1.0;
     result r = com_monte_carlo(N, &line);
     printf("=== Unit line ===\n");
-    printf("Length : %f (1.00)\n ", r.volume);
+    printf("Length : %f (%f)\n ", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
-    return 0;
+    return error_calculate(r.volume, expected);
 }
 
 int test_circle(){
     // unit circle in XY plane centred on (1,1,0)
-    int N = (int) 1E6;
     mc circle;
     circle.condition = circle_condition;
     circle.next_point = randomise_point;
@@ -107,12 +121,11 @@ int test_circle(){
     printf("Area : %f (%f)\n", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
-    return 0;
+    return error_calculate(r.volume, expected);
 }
 
 int test_sphere(){
     // unit sphere centred on (1,1,1)
-    int N = (int) 1E6;
     mc sphere;
     sphere.condition = sphere_condition;
     sphere.next_point = randomise_point;
@@ -129,12 +142,11 @@ int test_sphere(){
     printf("Volume : %f (%f)\n", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
-    return 0;
+    return error_calculate(r.volume, expected);
 }
 
 int test_square(){
     // unit square
-    int N = (int) 1E6;
     mc square;
     square.condition = square_condition;
     square.next_point = randomise_point;
@@ -143,18 +155,18 @@ int test_square(){
     square.limits.y.l = 0;
     square.limits.y.h = 2;
     
-    
+    double expected;
+    expected = 1.0;
     result r = com_monte_carlo(N, &square);
     printf("=== Unit Square ===\n");
-    printf("Area : %f (1.00)\n", r.volume);
+    printf("Area : %f (%f)\n", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
-    return 0;
+    return error_calculate(r.volume, expected);
 }
 
 int test_cube(){
     // unit square
-    int N = (int) 1E6;
     mc cube;
     cube.condition = cube_condition;
     cube.next_point = randomise_point;
@@ -165,13 +177,14 @@ int test_cube(){
     cube.limits.z.l = 0;
     cube.limits.z.h = 2;
     
-    
+    double expected;
+    expected = 1.0;
     result r = com_monte_carlo(N, &cube);
     printf("=== Unit Cube ===\n");
-    printf("Volume : %f (1.00)\n", r.volume);
+    printf("Volume : %f (%f)\n", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
-    return 0;
+    return error_calculate(r.volume, expected);
 }
 
 void run_tests(){
