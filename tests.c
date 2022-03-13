@@ -6,15 +6,19 @@ Tests!
 */
 
 #include "montecarlo.h"
-#include "assert.h"
 
 int N = (int) 1E6;
 double PRECISION = 1E-2;  // 1 in 100
 
-void run_tests();
+int run_tests();
 
 int main(){
-    run_tests();
+    int f = run_tests();
+    if (f == 0){
+        printf("All tests returned no error!\n\n");
+    }else{
+        printf("%d tests failed :(\n\n", f);
+    }
 }
 
 int line_condition(point *apoint){
@@ -257,13 +261,15 @@ int test_cube(){
     return error_calculate(r.volume, expected);
 }
 
-void run_tests(){
-    assert(test_line() == 0);
-    assert(test_square() == 0);
-    assert(test_cube() == 0);
-    assert(test_circle() == 0);
-    assert(test_cylinder() == 0);
-    assert(test_sphere() == 0);
-    assert(test_hemisphere() == 0);
-    printf("All silent failure or some success!\n");
+int run_tests(){
+    /* returns 0 if all tests pass */
+    int fail = 0;
+    fail += test_line();
+    fail += test_square();
+    fail += test_cube();
+    fail += test_circle();
+    fail += test_cylinder();
+    fail += test_sphere();
+    fail += test_hemisphere();
+    return fail;
 }
