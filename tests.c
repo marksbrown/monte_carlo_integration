@@ -18,7 +18,7 @@ int main(){
 }
 
 int line_condition(point *apoint){
-    if (apoint->x > 0 && apoint->x < 1){
+    if (apoint->x > -0.5 && apoint->x <= 0.5){
         return 1;
     } else {
         return 0;
@@ -30,6 +30,17 @@ int circle_condition(point *apoint){
     double r;
     r = pow(apoint->x - 1, 2) + pow(apoint->y - 1, 2);
     if (r <= 1){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int cylinder_condition(point *apoint){
+    // unit cylinder centred on origin aligned to z axis
+    double r;
+    r = pow(apoint->x, 2) + pow(apoint->y, 2);
+    if (r <= 1 && apoint->z > -0.5 && apoint->z <= 0.5){
         return 1;
     } else {
         return 0;
@@ -68,8 +79,10 @@ int square_condition(point *apoint){
 }
 
 int cube_condition(point *apoint){
-    // unit cube from (0,0,0) to (1,1,1)
-    if (apoint->x >= 0 && apoint->x < 1 && apoint->y >= 0 && apoint->y < 1 && apoint->z >= 0 && apoint->z < 1){
+    // unit cube centred on origin
+    if (apoint->x > -0.5 && apoint->x <= 0.5 && 
+        apoint->y > -0.5 && apoint->y <= 0.5 && 
+        apoint->z > -0.5 && apoint->z <= 0.5){
         return 1;
     } else {
         return 0;
@@ -95,8 +108,8 @@ int test_line(){
     line.condition = line_condition;
     line.next_point = randomise_point;
     
-    line.limits.x.l = 0;
-    line.limits.x.h = 2;
+    line.limits.x.l = -1;
+    line.limits.x.h = 1;
     line.limits.y.l = 0;
     line.limits.y.h = 0;
     line.limits.z.l = 0;
@@ -130,6 +143,28 @@ int test_circle(){
     result r = com_monte_carlo(N, &circle);
     printf("=== Unit Circle ===\n");
     printf("Area : %f (%f)\n", r.volume, expected);
+    printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
+
+    return error_calculate(r.volume, expected);
+}
+
+
+int test_cylinder(){
+    // unit cylinder centred on (0,0) along z axis between -0.5 and 0.5
+    mc cylinder;
+    cylinder.condition = cylinder_condition;
+    cylinder.next_point = randomise_point;
+    
+    cylinder.limits.x.l = -1;
+    cylinder.limits.x.h = 1;
+    cylinder.limits.y.l = -1;
+    cylinder.limits.y.h = 1;
+    cylinder.limits.z.l = -1;
+    cylinder.limits.z.h = 1;
+    double expected = 3.141592653589793;
+    result r = com_monte_carlo(N, &cylinder);
+    printf("=== Unit Cylinder ===\n");
+    printf("Volume : %f (%f)\n", r.volume, expected);
     printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
 
     return error_calculate(r.volume, expected);
@@ -187,6 +222,8 @@ int test_square(){
     square.limits.x.h = 2;
     square.limits.y.l = 0;
     square.limits.y.h = 2;
+    square.limits.z.l = 0;
+    square.limits.z.h = 0;
     
     double expected;
     expected = 1.0;
@@ -203,12 +240,12 @@ int test_cube(){
     mc cube;
     cube.condition = cube_condition;
     cube.next_point = randomise_point;
-    cube.limits.x.l = 0;
-    cube.limits.x.h = 2;
-    cube.limits.y.l = 0;
-    cube.limits.y.h = 2;
-    cube.limits.z.l = 0;
-    cube.limits.z.h = 2;
+    cube.limits.x.l = -1;
+    cube.limits.x.h = 1;
+    cube.limits.y.l = -1;
+    cube.limits.y.h = 1;
+    cube.limits.z.l = -1;
+    cube.limits.z.h = 1;
     
     double expected;
     expected = 1.0;
@@ -225,6 +262,7 @@ void run_tests(){
     assert(test_square() == 0);
     assert(test_cube() == 0);
     assert(test_circle() == 0);
+    assert(test_cylinder() == 0);
     assert(test_sphere() == 0);
     assert(test_hemisphere() == 0);
     printf("All silent failure or some success!\n");

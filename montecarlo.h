@@ -159,7 +159,6 @@ double calculate_cuboid_volume(lim3D *lims){
         return de.x * de.y * de.z;
     }
 }
-static int j;
 
 result com_monte_carlo(int N, mc *initial_conditions){
     /*
@@ -169,7 +168,7 @@ result com_monte_carlo(int N, mc *initial_conditions){
     point apoint, com;
     set_to_origin(&com);
     double V = calculate_cuboid_volume(&initial_conditions->limits);
-    extern int j;  // can be used to generate points deterministically
+    int j;
     int points_matching_condition;
     points_matching_condition = 0;
 
