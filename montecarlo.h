@@ -41,6 +41,7 @@ int checkzero(double v, double e);  // assume close to zero is zero
 double random_double();
 double random_scaled(limit lim);
 void randomise_point(point *p_point, lim3D *lim);
+void update_point(point *p_point, lim3D *lim);
 point calculate_elementals(lim3D *lims);
 double calculate_cuboid_volume(lim3D *lims);
 // prototypes for points
@@ -158,15 +159,17 @@ double calculate_cuboid_volume(lim3D *lims){
         return de.x * de.y * de.z;
     }
 }
+static int j;
 
 result com_monte_carlo(int N, mc *initial_conditions){
     /*
     Determine Centre of Mass (assuming uniform density)
     */
+    
     point apoint, com;
     set_to_origin(&com);
     double V = calculate_cuboid_volume(&initial_conditions->limits);
-    int j;
+    extern int j;  // can be used to generate points deterministically
     int points_matching_condition;
     points_matching_condition = 0;
 
@@ -186,15 +189,7 @@ result com_monte_carlo(int N, mc *initial_conditions){
     result r;
     r.volume =  (double) points_matching_condition / N * V;
     scale_point(&com, (double) 1./ points_matching_condition);
-    /*
-    point dV = dimensions(&initial_conditions->limits);
-
-    if (dV.x == 0){com.x = 0;}
-    if (dV.y == 0){com.y = 0;}
-    if (dV.z == 0){com.z = 0;}
-    */
     r.COM = com;
-    
     return r;
 }
 
