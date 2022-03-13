@@ -101,7 +101,7 @@ int error_calculate(double predicted, double expected){
     if (dx < PRECISION){
         return 0;
     } else {
-        printf("!!!!!!!!!!\nDeviation!\n%f | %f | %f\n!!!!!!!!!!", predicted, expected, dx);
+        printf("\n\n!!!!!!!!!!\nDeviation!\n%f | %f | %f\n!!!!!!!!!!\n\n", predicted, expected, dx);
         return 1;  // error!
     }
 }
