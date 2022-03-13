@@ -47,6 +47,17 @@ int sphere_condition(point *apoint){
     }
 }
 
+int hemisphere_condition (point *apoint){
+    // unit hemisphere centred on (1,1,0) pointing along the z axis
+    double r;
+    r = pow(apoint->x - 1, 2) + pow(apoint->y - 1, 2) + pow(apoint->z, 2);
+    if (r <= 1 && apoint->z >= 0){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 int square_condition(point *apoint){
     // unit square from (0,0,0) to (1,1,0)
     if (apoint->x >= 0 && apoint->x < 1 && apoint->y >= 0 && apoint->y < 1){
@@ -145,6 +156,28 @@ int test_sphere(){
     return error_calculate(r.volume, expected);
 }
 
+
+int test_hemisphere(){
+    // unit hemisphere centred on (1,1,1) pointing along z
+    mc hemisphere;
+    hemisphere.condition = hemisphere_condition;
+    hemisphere.next_point = randomise_point;
+    
+    hemisphere.limits.x.l = 0;
+    hemisphere.limits.x.h = 2;
+    hemisphere.limits.y.l = 0;
+    hemisphere.limits.y.h = 2;
+    hemisphere.limits.z.l = 0;
+    hemisphere.limits.z.h = 2;
+    double expected = 2.0943951023931953;
+    result r = com_monte_carlo(N, &hemisphere);
+    printf("=== Unit hemisphere ===\n");
+    printf("Volume : %f (%f)\n", r.volume, expected);
+    printf("COM (%f, %f, %f)\n", r.COM.x, r.COM.y, r.COM.z);
+
+    return error_calculate(r.volume, expected);
+}
+
 int test_square(){
     // unit square
     mc square;
@@ -193,5 +226,6 @@ void run_tests(){
     assert(test_cube() == 0);
     assert(test_circle() == 0);
     assert(test_sphere() == 0);
+    assert(test_hemisphere() == 0);
     printf("All silent failure or some success!\n");
 }
